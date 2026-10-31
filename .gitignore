@@ -1,0 +1,19 @@
+# Local Python environment
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Local app data and secrets
+instance/
+.env
+.env.*
+!.env.example
+*.db
+*.sqlite
+*.sqlite3
+
+# Editor and operating-system files
+.vscode/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token_value() }}">
+  <title>{% block title %}Temperature Monitor{% endblock %} · AetherCare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+  {% block head %}{% endblock %}
+</head>
+<body class="app-body" data-role="{{ current_user.role.name }}">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-icon">✳</span><span>Aether<span class="brand-light">Care</span><small>THERMAL ASSURANCE</small></span></a>
+    <div class="workspace-label">WORKSPACE</div>
+    <nav class="nav-list" aria-label="Main navigation">
+      <a class="nav-link {{ 'active' if active == 'dashboard' else '' }}" href="{{ url_for('dashboard') }}"><span class="nav-icon">◫</span>Overview</a>
+      <a class="nav-link {{ 'active' if active == 'monitoring' else '' }}" href="{{ url_for('monitoring') }}"><span class="nav-icon">⌁</span>Live monitoring<span class="live-dot"></span></a>
+      {% if current_user.role.name in ['Admin', 'Healthcare Staff'] %}<a class="nav-link {{ 'active' if active == 'simulation' else '' }}" href="{{ url_for('simulation') }}"><span class="nav-icon">◉</span>Simulation lab</a>{% endif %}
+      <a class="nav-link {{ 'active' if active == 'alerts' else '' }}" href="{{ url_for('alerts_page') }}"><span class="nav-icon">♧</span>Alert center<span class="nav-count" id="nav-alert-count"></span></a>
+      <a class="nav-link {{ 'active' if active == 'incidents' else '' }}" href="{{ url_for('incidents_page') }}"><span class="nav-icon">▤</span>Incidents</a>
+      <div class="workspace-label nav-spacer">ASSETS</div>
+      <a class="nav-link {{ 'active' if active == 'products' else '' }}" href="{{ url_for('products_page') }}"><span class="nav-icon">▣</span>Products</a>
+      <a class="nav-link {{ 'active' if active == 'sensors' else '' }}" href="{{ url_for('sensors_page') }}"><span class="nav-icon">⌖</span>Sensors</a>
+      <a class="nav-link {{ 'active' if active == 'locations' else '' }}" href="{{ url_for('add_location') }}"><span class="nav-icon">⌂</span>Storage locations</a>
+      <a class="nav-link {{ 'active' if active == 'reports' else '' }}" href="{{ url_for('reports_page') }}"><span class="nav-icon">▥</span>Reports & analytics</a>
+      {% if current_user.role.name == 'Admin' %}<a class="nav-link {{ 'active' if active == 'team' else '' }}" href="{{ url_for('team_page') }}"><span class="nav-icon">♙</span>Team access</a>{% endif %}
+    </nav>
+    <div class="sidebar-bottom"><div class="secure-chip"><span class="secure-mark">✓</span><span><b>Audit-ready workspace</b><small>Access is role controlled</small></span></div>
+      <div class="profile-row"><div class="avatar">{{ current_user.name[:1] }}</div><div class="profile-copy"><b>{{ current_user.name }}</b><small>{{ current_user.role.name }}</small></div>
+        <form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token_value() }}"><button class="icon-button logout-button" aria-label="Sign out" title="Sign out">⇥</button></form>
+      </div>
+    </div>
+  </aside>
+  <main class="main-shell">
+    <header class="topbar"><button class="mobile-menu icon-button" id="menu-toggle" aria-label="Open navigation">☰</button><div class="breadcrumbs"><span>Workspace</span><i>/</i><b>{% block breadcrumb %}Overview{% endblock %}</b></div>
+      <div class="top-actions"><span class="env-pill"><span></span> DEMO ENVIRONMENT</span><button class="top-icon" id="top-alerts" aria-label="Open alerts" onclick="location.href='{{ url_for('alerts_page') }}'">♧<i id="top-alert-dot"></i></button><div class="top-divider"></div><span class="top-date" id="today-date"></span></div>
+    </header>
+    <section class="page-content">
+      {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-stack">{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+      {% block content %}{% endblock %}
+    </section>
+    <footer class="app-footer"><span>© 2026 AetherCare Monitoring</span><span><b>Simulation data</b> · Not a clinical decision system</span></footer>
+  </main>
+  <div id="toast-region" class="toast-region" aria-live="polite"></div>
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
